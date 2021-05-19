@@ -9,7 +9,7 @@ def preprocess_input_mental(df):
 
     # Drop rows with missing target values
     missing_value_target = df.loc[df['Burn Rate'].isna(), :].index
-    df = df.drop(missing_value_target, axis=0)
+    df = df.drop(missing_value_target, axis=0).reset_index(drop=True)
 
     # Fill remaining missing values with column means
     for column in ['Resource Allocation', 'Mental Fatigue Score']:
@@ -34,6 +34,11 @@ def preprocess_input_mental(df):
     for column in X.columns:
         df[column] = df[column].apply(lambda x: (x -df[column].min()) / (df[column].max()-df[column].min()))
     
+    # reorder columns
+    reorder_col = X.columns.tolist()
+    reorder_col.append('Burn Rate')
+    df = df[reorder_col]
+
     del X
 
     return df
