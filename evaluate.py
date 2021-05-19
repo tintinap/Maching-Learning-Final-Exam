@@ -23,11 +23,11 @@ def accuracy_metric(actual, predicted):
 	return correct / float(len(actual)) * 100.0
 
 # Calculate R**2 score
-def r_squared_score(actual, predicted):
-    correlation_matrix = np.corrcoef(actual, predicted)
-    correlation_xy = correlation_matrix[0, 1]
-    
-    return correlation_xy**2
+def r2_score(actual, predicted):
+    rss = sum([(actual[i]-predicted[i])**2 for i in range(len(actual))])
+    tss = sum([(actual[i]-np.mean(actual))**2 for i in range(len(actual))])
+
+    return 1-(rss/tss)
  
 # Evaluate an algorithm using a cross validation split
 def evaluate_algorithm(dataset, algorithm, n_folds, measurement, *args):
@@ -43,7 +43,8 @@ def evaluate_algorithm(dataset, algorithm, n_folds, measurement, *args):
 			test_set.append(row_copy)
 			row_copy[-1] = None
 		predicted = algorithm(train_set, test_set, *args)
+		print('===========================================================================')
 		actual = [row[-1] for row in fold]
-		measurement = measurement(actual, predicted)
-		scores.append(measurement)
+		mea = r2_score(actual, predicted)
+		scores.append(mea)
 	return scores
