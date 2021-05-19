@@ -65,7 +65,10 @@ def gradient_descent(X, y, theta, alpha, iterations):
   
     return theta, cost_history
 
-def mlr_predict():
-
+def mlr_predict(X_test, test_theta):
+    prediction = list()
+    for i in range(len(X_test)):
+        test_data = np.hstack((np.ones(1), X_test[i,]))
+        prediction.append(test_data.dot(test_theta))
 
     return prediction
