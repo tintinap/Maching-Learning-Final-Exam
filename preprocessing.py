@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-def preprocess_input(df):
+def preprocess_input_mental(df):
     df = df.copy()
 
     # Drop Employee ID column
@@ -28,15 +28,15 @@ def preprocess_input(df):
     df['WFH Setup Available'] = df['WFH Setup Available'].replace({'No': 0, 'Yes': 1})
 
     # Split df into X and y
-    y = df['Burn Rate']
     X = df.drop('Burn Rate', axis=1)
 
     # Scale X
     for column in X.columns:
-        X[column] = X[column].apply(lambda x: (x -X[column].min()) / (X[column].max()-X[column].min()))
+        df[column] = df[column].apply(lambda x: (x -df[column].min()) / (df[column].max()-df[column].min()))
     
+    del X
 
-    return X, y
+    return df
 
 def check_available():
     print('good')
