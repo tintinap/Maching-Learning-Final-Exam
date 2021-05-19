@@ -1,6 +1,6 @@
 import numpy as np
 
-def compute_cost(X, y, theta):
+def compute_cost(X, y, theta, m):
     """
     Compute the cost of a particular choice of theta for linear regression.
 
@@ -31,7 +31,7 @@ def compute_cost(X, y, theta):
 
     return J
 
-def gradient_descent(X, y, theta, alpha, iterations):
+def gradient_descent(X, y, theta, alpha, iterations, m):
     """
     Compute cost for linear regression.
   
@@ -61,7 +61,7 @@ def gradient_descent(X, y, theta, alpha, iterations):
         #print('sum_delta= ', sum_delta[:5])
         theta = theta - sum_delta;
 
-    cost_history[i] = compute_cost(X, y, theta)  
+    cost_history[i] = compute_cost(X, y, theta, m)  
   
     return theta, cost_history
 
