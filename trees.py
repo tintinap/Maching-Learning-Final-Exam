@@ -1,7 +1,6 @@
 import numpy as np
 import math
 
-
 class Node():
     def __init__(self, feature_index=None, threshold=None, left=None, right=None, var_red=None, value=None):
         ''' constructor ''' 
@@ -15,37 +14,6 @@ class Node():
         
         # for leaf node
         self.value = value
-
-class RandomForestRegressor():
-    def __init__(self, X, y, n_trees, n_features, sample_sz, max_depth=10, min_samples_split=5):
-        np.random.seed(12)
-        if n_features == 'sqrt':
-            self.n_features = int(np.sqrt(X.shape[1]))
-        elif n_features == 'log2':
-            self.n_features = int(np.log2(X.shape[1]))
-        else:
-            self.n_features = n_features
-        print(self.n_features, "sha: ",X.shape[1])    
-        self.X, self.y, self.sample_sz, self.max_depth, self.min_samples_split  = X, y, sample_sz, max_depth, min_samples_split
-        self.trees = [self.create_tree() for i in range(n_trees)]
-
-    def create_tree(self):
-        idxs = np.random.permutation(len(self.y))[:self.sample_sz]
-        f_idxs = np.random.permutation(self.X.shape[1])[:self.n_features]
-        dt_regressor = DecisionTreeRegressor(min_samples_split=self.min_samples_split, max_depth=self.max_depth)
-        return dt_regressor.fit(self.X.iloc[idxs].iloc[:,f_idxs], self.y[idxs])
-
-    def make_prediction(self, row, trees):
-        ''' function to predict a single data point '''
-
-        return np.mean([tree.make_prediction(row, tree.root) for tree in trees])
-
-    def predict(self, X):
-        ''' function to predict new dataset '''
-
-        preditions = [self.make_prediction(row, self.trees) for row in X]
-        return preditions
-
 
 class DecisionTreeRegressor():
     def __init__(self, min_samples_split=2, max_depth=2):
@@ -172,3 +140,73 @@ class DecisionTreeRegressor():
         
         preditions = [self.make_prediction(row, self.root) for row in X]
         return preditions
+
+def random_forest_regression(X, y, test_X, n_trees, n_features, sample_sz):
+    np.random.seed(1)
+    #row_idx, col_idx
+    rf_row_4_each_tree = [(np.random.permutation(len(y))[:sample_sz], np.random.permutation(X.shape[1])[:n_features]) for i in range(n_trees)]
+    # example
+    #     [(array([13525, 10012,  9179, ...,  3144,   688,  2468]), array([6, 7, 5, 0])),
+    #     (array([ 6990,  9903,  7602, ...,  6707,  1525, 11287]), array([5, 4, 1, 3])),
+    #     (array([3844, 6751, 1905, ..., 7591, 7088, 2528]), array([7, 0, 4, 3])),
+    #     (array([4287, 4004, 3043, ..., 6780, 9880, 9819]), array([2, 1, 7, 5])),
+    #     (array([12379,  1106,  5205, ...,  8698, 11813,  2375]), array([3, 7, 6, 4])),
+    #     (array([13667,  4252, 14082, ...,  1114,  7080, 10546]), array([2, 3, 6, 1])),
+    #     (array([ 8261,  1926, 11879, ...,  4587,  6752,  9817]), array([6, 2, 5, 4])),
+    #     (array([ 4129,  4944, 14082, ..., 14875,  6144,  8428]), array([5, 6, 3, 7])),
+    #     (array([10431,   166,  5210, ..., 13999,  5311, 14215]), array([0, 3, 1, 4])),
+    #     (array([13519,  4921,  7531, ..., 14348,  8880,  8521]), array([7, 0, 5, 3]))]
+    trees = list()
+    for i in range(n_trees):
+        dt_reg = DecisionTreeRegressor(min_samples_split=3, max_depth=3)
+        dt_reg.fit(
+              X.iloc[:, rf_row_4_each_tree[i][1]].values,
+              y.iloc[rf_row_4_each_tree[i][0]].values.reshape(-1,1)
+        )
+        trees.append(dt_reg)
+    prediction = [tree.predict(test_X.values) for tree in trees]
+
+    print('for_checking')
+    for p in prediction:
+        print(p[:5])
+
+    return np.mean(prediction, axis=0).tolist()
+
+# class RandomForestRegressor():
+#     def __init__(self, X, y, n_trees, n_features, sample_sz, max_depth=10, min_samples_split=5):
+#         np.random.seed(12)
+#         if n_features == 'sqrt':
+#             self.n_features = int(np.sqrt(X.shape[1]))
+#         elif n_features == 'log2':
+#             self.n_features = int(np.log2(X.shape[1]))
+#         else:
+#             self.n_features = n_features
+#         print(self.n_features, "sha: ",X.shape[1])    
+#         self.X, self.y, self.sample_sz, self.max_depth, self.min_samples_split  = X, y, sample_sz, max_depth, min_samples_split
+#         print('creating_trees')
+#         self.trees = [self.create_tree() for i in range(n_trees)]
+
+#     def create_tree(self):
+#         idxs = np.random.permutation(len(self.y))[:self.sample_sz]
+#         f_idxs = np.random.permutation(self.X.shape[1])[:self.n_features]
+#         print(f_idxs)
+#         print(len(idxs))
+#         dt_regressor = DecisionTreeRegressor(
+#             min_samples_split=self.min_samples_split, 
+#             max_depth=self.max_depth
+#         )
+#         print('b4 fit')
+#         return dt_regressor.fit(
+#                 self.X.iloc[idxs].iloc[:,f_idxs].values, self.y.iloc[idxs].values.reshape(-1,1)
+#             )
+
+#     def make_prediction(self, row, trees):
+#         ''' function to predict a single data point '''
+
+#         return np.mean([tree.make_prediction(row, tree.root) for tree in trees])
+
+#     def predict(self, X):
+#         ''' function to predict new dataset '''
+
+#         preditions = [self.make_prediction(row, self.trees) for row in X]
+#         return preditions
