@@ -361,3 +361,38 @@ class DecisionTreeClassifier():
             return self.make_prediction(x, tree.left)
         else:
             return self.make_prediction(x, tree.right)
+
+
+from scipy import stats
+
+def random_forest_classifier(X, y, test_X, n_trees, n_features, sample_sz):
+    np.random.seed(1)
+    #row_idx, col_idx
+    rf_row_4_each_tree = [(np.random.permutation(len(y))[:sample_sz], np.random.permutation(X.shape[1])[:n_features]) for i in range(n_trees)]
+    # example
+    #     [(array([13525, 10012,  9179, ...,  3144,   688,  2468]), array([6, 7, 5, 0])),
+    #     (array([ 6990,  9903,  7602, ...,  6707,  1525, 11287]), array([5, 4, 1, 3])),
+    #     (array([3844, 6751, 1905, ..., 7591, 7088, 2528]), array([7, 0, 4, 3])),
+    #     (array([4287, 4004, 3043, ..., 6780, 9880, 9819]), array([2, 1, 7, 5])),
+    #     (array([12379,  1106,  5205, ...,  8698, 11813,  2375]), array([3, 7, 6, 4])),
+    #     (array([13667,  4252, 14082, ...,  1114,  7080, 10546]), array([2, 3, 6, 1])),
+    #     (array([ 8261,  1926, 11879, ...,  4587,  6752,  9817]), array([6, 2, 5, 4])),
+    #     (array([ 4129,  4944, 14082, ..., 14875,  6144,  8428]), array([5, 6, 3, 7])),
+    #     (array([10431,   166,  5210, ..., 13999,  5311, 14215]), array([0, 3, 1, 4])),
+    #     (array([13519,  4921,  7531, ..., 14348,  8880,  8521]), array([7, 0, 5, 3]))]
+    trees = list()
+    for i in range(n_trees):
+        dt_reg = DecisionTreeClassifier(min_samples_split=3, max_depth=3)
+        dt_reg.fit(
+              X.iloc[:, rf_row_4_each_tree[i][1]].values,
+              y.iloc[rf_row_4_each_tree[i][0]].values.reshape(-1,1)
+        )
+        trees.append(dt_reg)
+    prediction = [tree.predict(test_X.values) for tree in trees]
+
+    print('for_checking')
+    for p in prediction:
+        print(p[:10])
+
+    # return stats.mode(prediction)
+    return trees
