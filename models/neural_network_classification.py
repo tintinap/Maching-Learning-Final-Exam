@@ -1,9 +1,9 @@
 from random import random
 from math import exp
- 
+
 # Calculate neuron activation for an input
 def activate(weights, inputs):
-	activation = weights[-1] #add bias
+	activation = weights[-1]
 	for i in range(len(weights)-1):
 		activation += weights[i] * inputs[i]
 	return activation
@@ -64,10 +64,9 @@ def train_network(network, train, l_rate, n_epoch, n_outputs):
 		sum_error = 0
 		for row in train:
 			outputs = forward_propagate(network, row)
-			# print(row[-1], outputs)
 			expected = [0 for i in range(n_outputs)]
-			expected[-1] = row[-1]
-			sum_error += (expected[-1]-outputs[-1])**2
+			expected[row[-1]] = 1
+			sum_error += sum([(expected[i]-outputs[i])**2 for i in range(len(expected))])
 			backward_propagate_error(network, expected)
 			update_weights(network, row, l_rate)
 		print('>epoch=%d, lrate=%.3f, error=%.3f' % (epoch, l_rate, sum_error))
@@ -82,18 +81,18 @@ def initialize_network(n_inputs, n_hidden, n_outputs):
 	return network
  
 # Make a prediction with a network
-def nn_predict(network, row):
+def predict(network, row):
 	outputs = forward_propagate(network, row)
-	return max(outputs)
+	return outputs.index(max(set(outputs), key=outputs.count))
  
 # Backpropagation Algorithm With Stochastic Gradient Descent
-def back_propagation(train, test, l_rate, n_epoch, n_hidden=1):
+def back_propagation(train, test, l_rate, n_epoch, n_hidden):
 	n_inputs = len(train[0]) - 1
-	n_outputs = 1
+	n_outputs = len(set([row[-1] for row in train]))
 	network = initialize_network(n_inputs, n_hidden, n_outputs)
 	train_network(network, train, l_rate, n_epoch, n_outputs)
 	predictions = list()
 	for row in test:
-		prediction = nn_predict(network, row)
+		prediction = predict(network, row)
 		predictions.append(prediction)
 	return(predictions)

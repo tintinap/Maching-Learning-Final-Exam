@@ -43,5 +43,26 @@ def preprocess_input_mental(df):
 
     return df
 
+def preprocessing_input_drug(df):
+    df = df.copy()
+
+    # transform data
+    df['Sex'] = df['Sex'].replace({'F': 0, 'M': 1})
+    df['BP'] = df['BP'].replace({'HIGH':2, 'NORMAL': 1, 'LOW': 0})
+    df['Cholesterol'] = df['Cholesterol'].replace({'HIGH':2, 'NORMAL': 1})
+    df['Drug'] = df['Drug'].replace({'drugA': 0, 'drugB': 1, 'drugC': 2, 'drugX': 3, 'DrugY': 4})
+
+    # Split df into X
+    X = df.drop('Drug', axis=1)
+
+    # normalize data
+    for col in X.columns:
+        df[col] = df[col].apply(lambda x: (x -df[col].min()) / (df[col].max()-df[col].min()))
+
+    del X
+
+
+    return df
+
 def check_available():
     print('good')
