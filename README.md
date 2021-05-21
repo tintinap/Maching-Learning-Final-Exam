@@ -13,7 +13,7 @@ from https://www.kaggle.com/blurredmachine/are-your-employees-burning-out
 
 ref: https://github.com/tintinap/Maching-Learning-Final-Exam/blob/main/mental_health_burning_rate_of_employee_main.ipynb
 
-![](\img\mental_health_summary.PNG)
+![img](\img\mental_health_summary.PNG)
 
 <b>Dataset2</b> : Drug Classification
 
@@ -21,4 +21,4 @@ from https://www.kaggle.com/prathamtripathi/drug-classification
 
 ref: https://github.com/tintinap/Maching-Learning-Final-Exam/blob/main/drug_prediction_main.ipynb
 
-![](\img\drug_prediction_summary.PNG)
+![img](\img\drug_prediction_summary.PNG)
